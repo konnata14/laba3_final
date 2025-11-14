@@ -31,10 +31,11 @@ public class UI {
         System.out.println("Выберите действие:");
         System.out.println("1. Добавить фильм");
         System.out.println("2. Вывести все фильмы");
-        System.out.println("3. Поиск театра по режиссера");
+        System.out.println("3. Поиск фильма по названию");
         System.out.println("4. Определить фильм с наибольшей стоимостью проката");
         System.out.println("5. Сортировать фильмы по названию ");
         System.out.println("6. Выбрать фильм");
+        System.out.println("7. Определить фильм с самым ранним годом выпуска");
         System.out.println("Для выхода введите пустую строку...");
         System.out.print("Ваше действие: ");
     }
@@ -46,7 +47,12 @@ public class UI {
         getInformationMessage();
 
         menu();
-        String choice = _sc.nextLine();
+        String choice = "";
+        try {
+            choice = _sc.nextLine();
+        } catch (Exception e) {
+            System.out.println("Ошибка ввода данных: " + e.getMessage());
+        }
         while (!choice.isEmpty()) {
             try {
                 switch (choice) {
@@ -68,6 +74,9 @@ public class UI {
                     case "6" :
                         interactionWithFilm();
                         break;
+                    case "7" :
+                        determineyear();
+                        break;
                     default:
                         System.out.println("Действие не распознано!\n");
                         break;
@@ -76,183 +85,238 @@ public class UI {
                 System.out.println("Ошибка ввода данных: " + e.getMessage());
             }
             menu();
-            choice = _sc.nextLine();
+            try {
+                choice = _sc.nextLine();
+            } catch (Exception e) {
+                System.out.println("Ошибка ввода данных: " + e.getMessage());
+               
+            }
         }
         System.out.println("Вы вышли из программы!");
 
     }
 
-    /**
-     * Инициирует добавление нового фильма
-     */
     private void addNewFilm() {
-        System.out.println("Выберите тип фильма: ");
-        System.out.println("1 - художественный: ");
-        System.out.println("2 - документальный: ");
-        System.out.print("Ваш выбор: ");
-        String input = _sc.nextLine();
+        try {
+            System.out.println("Выберите тип фильма:");
+            System.out.println("1 - художественный");
+            System.out.println("2 - документальный");
+            System.out.print("Ваш выбор: ");
+            String input = _sc.nextLine();
 
-        if (input.equals("1")) {
-            addFeatureFilmMenu();
-        } else if (input.equals("2")){
-            addDocumentaryFilmMenu();
-        } else {
-            System.out.println("Тип фильма указан неверно!\n");
+            switch (input) {
+                case "1":
+                    addFeatureFilmMenu();
+                    break;
+                case "2":
+                    addDocumentaryFilmMenu();
+                    break;
+                default:
+                    System.out.println("Тип фильма указан неверно!\n");
+            }
+        } catch (Exception e) {
+            System.out.println("Ошибка ввода: " + e.getMessage());
         }
     }
 
     /**
-     * Метод, инициирующий поиск фильма по названию
+     * Поиск фильма по названию
      */
     private void findByTitle() {
-        if (!Film._array.isEmpty()) {
-            System.out.print("Введите название: ");
-            System.out.println(Film.findByTitle(_sc.nextLine()));
-        } else {
-            System.out.println("Действие невозможно: список пуст!\n");
+        try {
+            if (!Film._array.isEmpty()) {
+                System.out.print("Введите название: ");
+                String title = _sc.nextLine();
+                System.out.println(Film.findByTitle(title));
+            } else {
+                System.out.println("Список фильмов пуст!\n");
+            }
+        } catch (Exception e) {
+            System.out.println("Ошибка ввода: " + e.getMessage());
         }
     }
 
     /**
-     * Метод взаимодействия с фильмами
+     * Взаимодействие с выбранным фильмом
      */
     private void interactionWithFilm() {
-        if (!Film._array.isEmpty()) {
+        try {
+            if (Film._array.isEmpty()) {
+                System.out.println("Список фильмов пуст!\n");
+                return;
+            }
+
             System.out.println(Film.showAll());
             System.out.print("Выберите фильм: ");
-            int index = Integer.parseInt(_sc.nextLine());
-            if (1 <= index && index <= Film.getSize()) {
-                System.out.println("Выберите действие: ");
-                System.out.println("1. Посмотреть информацию о фильме");
-                System.out.println("2. Редактировать данные о фильме");
-                System.out.println("3. Удалить фильм");
-                System.out.println("Для возвращения введите пустую строку...");
-                System.out.print("Ваше действие: ");
-                String choice = _sc.nextLine();
-                switch (choice) {
-                    case "1":
-                        System.out.println(Film.findByIndex(index - 1));
-                        break;
-                    case "2":
-                        fieldReplacement(index - 1);
-                        break;
-                    case "3":
-                        Film.removeByIndex(index - 1);
-                        System.out.println("Фильм удалён!");
-                        break;
-                    default:
-                        System.out.println("Указан неверный номер фильма!\n");
-                        break;
-                }
-            } else {
-                System.out.println("Действие невозможно: список пуст!\n");
+            int index = Integer.parseInt(_sc.nextLine()) - 1;
+
+            if (index < 0 || index >= Film.getSize()) {
+                System.out.println("Неверный номер фильма!\n");
+                return;
             }
+
+            System.out.println("1. Посмотреть информацию о фильме");
+            System.out.println("2. Редактировать данные о фильме");
+            System.out.println("3. Удалить фильм");
+            System.out.println("Для возвращения введите пустую строку...");
+            System.out.print("Ваше действие: ");
+            String action = _sc.nextLine();
+
+            switch (action) {
+                case "1":
+                    System.out.println(Film.findByIndex(index));
+                    break;
+                case "2":
+                    fieldReplacement(index);
+                    break;
+                case "3":
+                    Film.removeByIndex(index);
+                    System.out.println("Фильм удалён!");
+                    break;
+                default:
+                    System.out.println("Неверный выбор!\n");
+            }
+        } catch (Exception e) {
+            System.out.println("Ошибка ввода: " + e.getMessage());
         }
     }
 
     /**
-     * Метод, инициирующий поиск фильма с самой высокой стоимость проката
+     * Определение фильма с наибольшей стоимостью проката
      */
     private void determineTheHighestRentalCost() {
-        if (!Film._array.isEmpty()) {
-            System.out.println(Film.getFilmsAboveAverageRentalCost());
-        } else {
-            System.out.println("Действие невозможно: список пуст!\n");
+        try {
+            if (!Film._array.isEmpty()) {
+                System.out.println(Film.getFilmsAboveAverageRentalCost());
+            } else {
+                System.out.println("Список фильмов пуст!\n");
+            }
+        } catch (Exception e) {
+            System.out.println("Ошибка ввода: " + e.getMessage());
         }
     }
 
     /**
-     * Метод, инициирующий добавление нового художественного фильма
+     * Определение фильма с самым ранним годом выпуска
+     */
+    private void determineyear() {
+        try {
+            if (!Film._array.isEmpty()) {
+                System.out.println(Film.getFilmsfirstyear());
+            } else {
+                System.out.println("Список фильмов пуст!\n");
+            }
+        } catch (Exception e) {
+            System.out.println("Ошибка ввода: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Добавление художественного фильма
      */
     private void addFeatureFilmMenu() {
-        System.out.print("Введите название фильма: ");
-        String title = _sc.nextLine();
-        System.out.print("Введите режиссера: ");
-        String director = _sc.nextLine();
-        System.out.print("Введите стоимость проката: ");
-        int rentalcost = Integer.parseInt(_sc.nextLine());
-        System.out.print("Введите год: ");
-        int year= Integer.parseInt(_sc.nextLine());
-        System.out.print("Введите жанр: ");
-        String genre = _sc.nextLine();
-        System.out.print("Введите основан ли он на реальных событиях: ");
-        String basedonreal = _sc.nextLine();
-        if (Validator.paramsValidate(title, director, rentalcost, year, genre, basedonreal)) {
-            Film.addFeatureFilm(title, director, rentalcost, year, genre, basedonreal);
-            System.out.println("Художественный фильмуспешно добавлен!\n");
-        } else {
-            System.out.println("Художественный фильм не может быть добавлен! Ошибки:\n" +
-                    Validator.validateMessage(title, director, rentalcost, year, genre, basedonreal));
+        try {
+            System.out.print("Введите название фильма: ");
+            String title = _sc.nextLine();
+            System.out.print("Введите режиссера: ");
+            String director = _sc.nextLine();
+            System.out.print("Введите стоимость проката: ");
+            int rentalcost = Integer.parseInt(_sc.nextLine());
+            System.out.print("Введите год: ");
+            int year = Integer.parseInt(_sc.nextLine());
+            System.out.print("Введите жанр: ");
+            String genre = _sc.nextLine();
+            System.out.print("Основан ли на реальных событиях: ");
+            String basedonreal = _sc.nextLine();
+
+            if (Validator.paramsValidate(title, director, rentalcost, year, genre, basedonreal)) {
+                Film.addFeatureFilm(title, director, rentalcost, year, genre, basedonreal);
+                System.out.println("Художественный фильм успешно добавлен!\n");
+            } else {
+                System.out.println("Ошибка при добавлении фильма:\n" +
+                        Validator.validateMessage(title, director, rentalcost, year, genre, basedonreal));
+            }
+        } catch (Exception e) {
+            System.out.println("Ошибка ввода: " + e.getMessage());
         }
     }
 
     /**
-     * Метод, инициирующий добавление нового документального фильма
+     * Добавление документального фильма
      */
     private void addDocumentaryFilmMenu() {
-        System.out.print("Введите название фильма: ");
-        String title = _sc.nextLine();
-        System.out.print("Введите режиссера: ");
-        String director = _sc.nextLine();
-        System.out.print("Введите стоимость проката: ");
-        int rentalcost = Integer.parseInt(_sc.nextLine());
-        System.out.print("Введите год: ");
-        int year= Integer.parseInt(_sc.nextLine());
-        System.out.print("Введите предмет исследования: ");
-        String subject = _sc.nextLine();
-        System.out.print("Введите источник информации: ");
-        String source = _sc.nextLine();
-        if (Validator.paramsValidate(title, director, rentalcost, year, subject , source)) {
-            Film.addDocumentaryFilm(title, director, rentalcost, year, subject , source);
-            System.out.println("Документальный фильм успешно добавлен!\n");
-        } else {
-            System.out.println("Документальный фильм не может быть добавлен! Ошибки:\n" +
-                    Validator.validateMessage(title, director, rentalcost, year, subject , source));
+        try {
+            System.out.print("Введите название фильма: ");
+            String title = _sc.nextLine();
+            System.out.print("Введите режиссера: ");
+            String director = _sc.nextLine();
+            System.out.print("Введите стоимость проката: ");
+            int rentalcost = Integer.parseInt(_sc.nextLine());
+            System.out.print("Введите год: ");
+            int year = Integer.parseInt(_sc.nextLine());
+            System.out.print("Введите предмет исследования: ");
+            String subject = _sc.nextLine();
+            System.out.print("Введите источник информации: ");
+            String source = _sc.nextLine();
+
+            if (Validator.paramsValidate(title, director, rentalcost, year, subject, source)) {
+                Film.addDocumentaryFilm(title, director, rentalcost, year, subject, source);
+                System.out.println("Документальный фильм успешно добавлен!\n");
+            } else {
+                System.out.println("Ошибка при добавлении фильма:\n" +
+                        Validator.validateMessage(title, director, rentalcost, year, subject, source));
+            }
+        } catch (Exception e) {
+            System.out.println("Ошибка ввода: " + e.getMessage());
         }
     }
 
     /**
-     * Метод взаимодействия с заменой полей
-     * @param index индекс элемента списка
+     * Замена полей фильма
      */
     private void fieldReplacement(int index) {
-        System.out.println("Выберите поле для изменения: ");
-        System.out.print(Film._array.get(index).fieldInformation());
-        System.out.print("Ваш выбор: ");
-        String choice = _sc.nextLine();
-        switch(choice) {
-            case "1":
-                System.out.print("Введите новое название: ");
-                String newtitle = _sc.nextLine();
-                System.out.println(Film._array.get(index).getNewtitle(newtitle));
-                break;
-            case "2":
-                System.out.print("Введите новое имя: ");
-                String newdirector = _sc.nextLine();
-                System.out.println(Film._array.get(index).getNewdirector(newdirector));
-                break;
-            case "3":
-                System.out.print("Введите новую стоимость проката: ");
-                int newrentalcost = Integer.parseInt(_sc.nextLine());
-                System.out.println(Film._array.get(index).getNewrentalcost(newrentalcost));
-                break;
-            case "4":
-                System.out.print("Введите новый год выхода фильма: ");
-                int newyear = Integer.parseInt(_sc.nextLine());
-                System.out.println(Film._array.get(index).getNewyear(newyear));
-                break;
-            case "5":
-                System.out.print("Введите новый значение: ");
-                String newMeaning1 = _sc.nextLine();
-                System.out.println(Film._array.get(index).getNewFirstSpecificField(newMeaning1));
-                break;
-            case "6":
-                System.out.print("Введите новый значение: ");
-                String newMeaning2 = _sc.nextLine();
-                System.out.println(Film._array.get(index).getNewSecondSpecificField(newMeaning2));
-                break;
+        try {
+            System.out.println("Выберите поле для изменения: ");
+            System.out.print(Film._array.get(index).fieldInformation());
+            System.out.print("Ваш выбор: ");
+            String choice = _sc.nextLine();
+
+            switch (choice) {
+                case "1":
+                    System.out.print("Введите новое название: ");
+                    String newTitle = _sc.nextLine();
+                    System.out.println(Film._array.get(index).getNewtitle(newTitle));
+                    break;
+                case "2":
+                    System.out.print("Введите новое имя: ");
+                    String newDirector = _sc.nextLine();
+                    System.out.println(Film._array.get(index).getNewdirector(newDirector));
+                    break;
+                case "3":
+                    System.out.print("Введите новую стоимость проката: ");
+                    int newRentalcost = Integer.parseInt(_sc.nextLine());
+                    System.out.println(Film._array.get(index).getNewrentalcost(newRentalcost));
+                    break;
+                case "4":
+                    System.out.print("Введите новый год: ");
+                    int newYear = Integer.parseInt(_sc.nextLine());
+                    System.out.println(Film._array.get(index).getNewyear(newYear));
+                    break;
+                case "5":
+                    System.out.print("Введите новое значение: ");
+                    String newMeaning1 = _sc.nextLine();
+                    System.out.println(Film._array.get(index).getNewFirstSpecificField(newMeaning1));
+                    break;
+                case "6":
+                    System.out.print("Введите новое значение: ");
+                    String newMeaning2 = _sc.nextLine();
+                    System.out.println(Film._array.get(index).getNewSecondSpecificField(newMeaning2));
+                    break;
+                default:
+                    System.out.println("Неверный выбор!\n");
+            }
+        } catch (Exception e) {
+            System.out.println("Ошибка ввода: " + e.getMessage());
         }
     }
 }
-
-
